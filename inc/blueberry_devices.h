@@ -58,6 +58,8 @@
 #define BLUEBERRY_DEVICES_OSCOPE_DATA_MESSAGE_KEY (0x4244831d)
 #define BLUEBERRY_DEVICES_SONAR_A_SCAN_MESSAGE_KEY (0x4244c136)
 #define BLUEBERRY_DEVICES_SPI_TRANSACTION_MESSAGE_KEY (0x424425ed)
+#define BLUEBERRY_DEVICES_TCS_3400_DATA_16_MESSAGE_KEY (0x42446efe)
+#define BLUEBERRY_DEVICES_TCS_3400_DATA_8_MESSAGE_KEY (0x4244c342)
 #define BLUEBERRY_DEVICES_THERMISTOR_CONFIG_MESSAGE_KEY (0x4244aae3)
 #define BLUEBERRY_DEVICES_THERMISTOR_DATA_MESSAGE_KEY (0x4244d51a)
 #define BLUEBERRY_DEVICES_TIME_MESSAGE_KEY (0x42443c5b)
@@ -345,6 +347,24 @@ typedef enum {
 } BaudDivBbEnum;
 
 /**
+ * An enum for defining the available 8-bit parameters of the tcs3400
+ */
+typedef enum {
+	PARAMETER_8_REVID = 0x0000, 
+	PARAMETER_8_ID = 0x0001, 
+} Parameter8Enum;
+
+/**
+ * An enum for defining the available 16-bit parameters of the tcs3400
+ */
+typedef enum {
+	PARAMETER_16_CLEAR = 0x0000, 
+	PARAMETER_16_RED = 0x0001, 
+	PARAMETER_16_GREEN = 0x0002, 
+	PARAMETER_16_BLUE = 0x0003, 
+} Parameter16Enum;
+
+/**
  * an enum to convey PCB type
  */
 typedef enum {
@@ -391,6 +411,8 @@ extern const char OSCOPE_CONFIG_MESSAGE_TOPIC[];
 extern const char OSCOPE_DATA_MESSAGE_TOPIC[];
 extern const char SONAR_A_SCAN_MESSAGE_TOPIC[];
 extern const char SPI_TRANSACTION_MESSAGE_TOPIC[];
+extern const char TCS_3400_DATA_16_MESSAGE_TOPIC[];
+extern const char TCS_3400_DATA_8_MESSAGE_TOPIC[];
 extern const char THERMISTOR_CONFIG_MESSAGE_TOPIC[];
 extern const char THERMISTOR_DATA_MESSAGE_TOPIC[];
 extern const char TIME_MESSAGE_TOPIC[];
@@ -547,6 +569,24 @@ BbBlock addSonarAScanMessage(Bb * buf, uint32_t captureId, uint32_t firstSampleI
  * @returns - the index of the new message.
  */
 BbBlock addSpiTransactionMessage(Bb * buf, SpiDevBbEnum spiDev, PortPinEnum csPin, BaudDivBbEnum baudDiv, ClockSpecBbEnum clockSpec, uint16_t numBytes, bool deAssertCs, int32_t transactionId);
+/**
+ * Adds a Tcs 3400 Data 16 Message to the end of the current buffer
+ * A message to pass 16-bit data from the tcs3400 colour sensor into blueberry studio
+ * @param buf - the message buffer to add the message to
+ * @param param - An enum for defining the available 16-bit parameters of the tcs3400
+ * @param data
+ * @returns - the index of the new message.
+ */
+BbBlock addTcs3400Data16Message(Bb * buf, Parameter16Enum param, uint16_t data);
+/**
+ * Adds a Tcs 3400 Data 8 Message to the end of the current buffer
+ * A message to pass 8-bit data from the tcs3400 colour sensor into blueberry studio
+ * @param buf - the message buffer to add the message to
+ * @param param - An enum for defining the available 8-bit parameters of the tcs3400
+ * @param data
+ * @returns - the index of the new message.
+ */
+BbBlock addTcs3400Data8Message(Bb * buf, Parameter8Enum param, uint8_t data);
 /**
  * Adds a Thermistor Config Message to the end of the current buffer
  * A message to convey config parameters for Thermistors
@@ -3496,6 +3536,70 @@ void initSpiTransactionMessageTransactionData(Bb * buf, BbBlock msg, uint32_t n)
  * @return - the number of elements in the sequence
  */
 uint32_t getSpiTransactionMessageTransactionDataSequenceLength(Bb * buf, BbBlock msg);
+/**
+ * Tests if the current message has no fields present.
+ * A message to pass 16-bit data from the tcs3400 colour sensor into blueberry studio
+ */
+bool isTcs3400Data16MessageEmpty(Bb * buf, BbBlock msg);
+/**
+ * Tests if the current message has all defined fields present.
+ * A message to pass 16-bit data from the tcs3400 colour sensor into blueberry studio
+ */
+bool isTcs3400Data16MessageFull(Bb * buf, BbBlock msg);
+/**
+ * A getter for the param field
+ * An enum for defining the available 16-bit parameters of the tcs3400
+ * @param buf - the message buffer to add the message to
+ * @param msg - the index of the start of the message
+ */
+Parameter16Enum getTcs3400Data16MessageParam(Bb * buf, BbBlock msg );
+/**
+ * Tests if the current message containts the param field
+ * An enum for defining the available 16-bit parameters of the tcs3400
+ */
+bool isTcs3400Data16MessageParamPresent(Bb * buf, BbBlock msg );
+/**
+ * A getter for the data field
+ * @param buf - the message buffer to add the message to
+ * @param msg - the index of the start of the message
+ */
+uint16_t getTcs3400Data16MessageData(Bb * buf, BbBlock msg );
+/**
+ * Tests if the current message containts the data field
+ */
+bool isTcs3400Data16MessageDataPresent(Bb * buf, BbBlock msg );
+/**
+ * Tests if the current message has no fields present.
+ * A message to pass 8-bit data from the tcs3400 colour sensor into blueberry studio
+ */
+bool isTcs3400Data8MessageEmpty(Bb * buf, BbBlock msg);
+/**
+ * Tests if the current message has all defined fields present.
+ * A message to pass 8-bit data from the tcs3400 colour sensor into blueberry studio
+ */
+bool isTcs3400Data8MessageFull(Bb * buf, BbBlock msg);
+/**
+ * A getter for the param field
+ * An enum for defining the available 8-bit parameters of the tcs3400
+ * @param buf - the message buffer to add the message to
+ * @param msg - the index of the start of the message
+ */
+Parameter8Enum getTcs3400Data8MessageParam(Bb * buf, BbBlock msg );
+/**
+ * Tests if the current message containts the param field
+ * An enum for defining the available 8-bit parameters of the tcs3400
+ */
+bool isTcs3400Data8MessageParamPresent(Bb * buf, BbBlock msg );
+/**
+ * A getter for the data field
+ * @param buf - the message buffer to add the message to
+ * @param msg - the index of the start of the message
+ */
+uint8_t getTcs3400Data8MessageData(Bb * buf, BbBlock msg );
+/**
+ * Tests if the current message containts the data field
+ */
+bool isTcs3400Data8MessageDataPresent(Bb * buf, BbBlock msg );
 /**
  * Tests if the current message has no fields present.
  * A message to convey config parameters for Thermistors

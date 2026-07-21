@@ -178,6 +178,16 @@
 #define SPI_TRANSACTION_MESSAGE_TRANSACTION_DATA_INDEX (0)
 #define SPI_TRANSACTION_MESSAGE_TRANSACTION_DATA_PLACEHOLDER_INDEX (20)
 #define SPI_TRANSACTION_MESSAGE_TRANSACTION_ID_INDEX (16)
+#define TCS_3400_DATA_16_MESSAGE_DATA_INDEX (10)
+#define TCS_3400_DATA_16_MESSAGE_LENGTH_INDEX (4)
+#define TCS_3400_DATA_16_MESSAGE_MAX_ORDINAL_INDEX (6)
+#define TCS_3400_DATA_16_MESSAGE_MODULE_MESSAGE_KEY_INDEX (0)
+#define TCS_3400_DATA_16_MESSAGE_PARAM_INDEX (8)
+#define TCS_3400_DATA_8_MESSAGE_DATA_INDEX (9)
+#define TCS_3400_DATA_8_MESSAGE_LENGTH_INDEX (4)
+#define TCS_3400_DATA_8_MESSAGE_MAX_ORDINAL_INDEX (6)
+#define TCS_3400_DATA_8_MESSAGE_MODULE_MESSAGE_KEY_INDEX (0)
+#define TCS_3400_DATA_8_MESSAGE_PARAM_INDEX (8)
 #define THERMISTOR_CONFIG_MESSAGE_CONFIG_ADC_CHANNEL_INDEX (2)
 #define THERMISTOR_CONFIG_MESSAGE_CONFIG_CHANNEL_INDEX (0)
 #define THERMISTOR_CONFIG_MESSAGE_CONFIG_C_0_INDEX (4)
@@ -351,6 +361,16 @@
 #define SPI_TRANSACTION_MESSAGE_SPI_DEV_ORDINAL (3)
 #define SPI_TRANSACTION_MESSAGE_TRANSACTION_DATA_PLACEHOLDER_ORDINAL (10)
 #define SPI_TRANSACTION_MESSAGE_TRANSACTION_ID_ORDINAL (9)
+#define TCS_3400_DATA_16_MESSAGE_DATA_ORDINAL (4)
+#define TCS_3400_DATA_16_MESSAGE_LENGTH_ORDINAL (1)
+#define TCS_3400_DATA_16_MESSAGE_MAX_ORDINAL_ORDINAL (2)
+#define TCS_3400_DATA_16_MESSAGE_MODULE_MESSAGE_KEY_ORDINAL (0)
+#define TCS_3400_DATA_16_MESSAGE_PARAM_ORDINAL (3)
+#define TCS_3400_DATA_8_MESSAGE_DATA_ORDINAL (4)
+#define TCS_3400_DATA_8_MESSAGE_LENGTH_ORDINAL (1)
+#define TCS_3400_DATA_8_MESSAGE_MAX_ORDINAL_ORDINAL (2)
+#define TCS_3400_DATA_8_MESSAGE_MODULE_MESSAGE_KEY_ORDINAL (0)
+#define TCS_3400_DATA_8_MESSAGE_PARAM_ORDINAL (3)
 #define THERMISTOR_CONFIG_MESSAGE_CONFIG_ADC_CHANNEL_ORDINAL (3)
 #define THERMISTOR_CONFIG_MESSAGE_CONFIG_CHANNEL_ORDINAL (3)
 #define THERMISTOR_CONFIG_MESSAGE_CONFIG_C_0_ORDINAL (3)
@@ -420,6 +440,10 @@
 #define SONAR_A_SCAN_MESSAGE_MODULE_MESSAGE_KEY (0x4244c136)
 #define SPI_TRANSACTION_MESSAGE_MAX_ORDINAL (10)
 #define SPI_TRANSACTION_MESSAGE_MODULE_MESSAGE_KEY (0x424425ed)
+#define TCS_3400_DATA_16_MESSAGE_MAX_ORDINAL (4)
+#define TCS_3400_DATA_16_MESSAGE_MODULE_MESSAGE_KEY (0x42446efe)
+#define TCS_3400_DATA_8_MESSAGE_MAX_ORDINAL (4)
+#define TCS_3400_DATA_8_MESSAGE_MODULE_MESSAGE_KEY (0x4244c342)
 #define THERMISTOR_CONFIG_MESSAGE_MAX_ORDINAL (3)
 #define THERMISTOR_CONFIG_MESSAGE_MODULE_MESSAGE_KEY (0x4244aae3)
 #define THERMISTOR_DATA_MESSAGE_MAX_ORDINAL (3)
@@ -473,6 +497,8 @@
 #define OSCOPE_DATA_MESSAGE_LENGTH (28)
 #define SONAR_A_SCAN_MESSAGE_LENGTH (32)
 #define SPI_TRANSACTION_MESSAGE_LENGTH (24)
+#define TCS_3400_DATA_16_MESSAGE_LENGTH (12)
+#define TCS_3400_DATA_8_MESSAGE_LENGTH (12)
 #define THERMISTOR_CONFIG_MESSAGE_LENGTH (12)
 #define THERMISTOR_DATA_MESSAGE_LENGTH (12)
 #define TIME_MESSAGE_LENGTH (16)
@@ -508,6 +534,8 @@ const char OSCOPE_CONFIG_MESSAGE_TOPIC[] = "blueberry/devices/\x81/\x80/oscope-c
 const char OSCOPE_DATA_MESSAGE_TOPIC[] = "blueberry/devices/\x81/\x80/oscope-data";
 const char SONAR_A_SCAN_MESSAGE_TOPIC[] = "blueberry/devices/\x81/\x80/sonar-a-scan";
 const char SPI_TRANSACTION_MESSAGE_TOPIC[] = "blueberry/devices/\x81/\x80/spi-transaction";
+const char TCS_3400_DATA_16_MESSAGE_TOPIC[] = "blueberry/devices/\x81/\x80/tcs3400-data16";
+const char TCS_3400_DATA_8_MESSAGE_TOPIC[] = "blueberry/devices/\x81/\x80/tcs3400-data8";
 const char THERMISTOR_CONFIG_MESSAGE_TOPIC[] = "blueberry/devices/\x81/\x80/thermistor-config";
 const char THERMISTOR_DATA_MESSAGE_TOPIC[] = "blueberry/devices/\x81/\x80/thermistor-data";
 const char TIME_MESSAGE_TOPIC[] = "blueberry/devices/\x81/\x80/time";
@@ -3512,6 +3540,140 @@ uint32_t getSpiTransactionMessageTransactionDataSequenceLength(Bb * buf, BbBlock
 	}
 	//i is now the index of this sequence field header
 	return getBbSequenceLength(buf, msg, i);
+}
+/**
+ * Adds a Tcs 3400 Data 16 Message to the end of the current buffer
+ * A message to pass 16-bit data from the tcs3400 colour sensor into blueberry studio
+ * @param buf - the message buffer to add the message to
+ * @param param - An enum for defining the available 16-bit parameters of the tcs3400
+ * @param data
+ * @returns - the index of the new message.
+ */
+BbBlock addTcs3400Data16Message(Bb * buf, Parameter16Enum param, uint16_t data){
+	BbBlock msg = buf->length;
+	//Extend buffer to include the main message body before writing it
+	buf->length = msg + TCS_3400_DATA_16_MESSAGE_LENGTH;
+	setBbUint32(buf, msg, TCS_3400_DATA_16_MESSAGE_MODULE_MESSAGE_KEY_INDEX, TCS_3400_DATA_16_MESSAGE_MODULE_MESSAGE_KEY);
+	setBbUint16(buf, msg, TCS_3400_DATA_16_MESSAGE_LENGTH_INDEX, TCS_3400_DATA_16_MESSAGE_LENGTH/4);//length field is measured in 4-byte words
+	setBbUint8(buf, msg, TCS_3400_DATA_16_MESSAGE_MAX_ORDINAL_INDEX, TCS_3400_DATA_16_MESSAGE_MAX_ORDINAL);
+	setBbUint8(buf, msg, TCS_3400_DATA_16_MESSAGE_PARAM_INDEX, param);
+	setBbUint16(buf, msg, TCS_3400_DATA_16_MESSAGE_DATA_INDEX, data);
+	return msg;
+}
+/**
+ * Tests if the current message has no fields present.
+ * A message to pass 16-bit data from the tcs3400 colour sensor into blueberry studio
+ */
+bool isTcs3400Data16MessageEmpty(Bb * buf, BbBlock msg){
+	return getBbMessageMaxOrdinal(buf, msg) <= 2;//will always be length and ordinal fields
+}
+/**
+ * Tests if the current message has all defined fields present.
+ * A message to pass 16-bit data from the tcs3400 colour sensor into blueberry studio
+ */
+bool isTcs3400Data16MessageFull(Bb * buf, BbBlock msg){
+	return getBbMessageMaxOrdinal(buf, msg) >= TCS_3400_DATA_16_MESSAGE_MAX_ORDINAL;
+}
+/**
+ * A getter for the param field
+ * An enum for defining the available 16-bit parameters of the tcs3400
+ * @param buf - the message buffer to add the message to
+ * @param msg - the index of the start of the message
+ */
+Parameter16Enum getTcs3400Data16MessageParam(Bb * buf, BbBlock msg ){
+	uint16_t i = 0;
+	i += TCS_3400_DATA_16_MESSAGE_PARAM_INDEX;
+	return getBbUint8(buf, msg, i);
+}
+/**
+ * Tests if the current message containts the param field
+ * An enum for defining the available 16-bit parameters of the tcs3400
+ */
+bool isTcs3400Data16MessageParamPresent(Bb * buf, BbBlock msg ){
+	return TCS_3400_DATA_16_MESSAGE_PARAM_ORDINAL <= (getBbMessageMaxOrdinal(buf, msg));
+}
+/**
+ * A getter for the data field
+ * @param buf - the message buffer to add the message to
+ * @param msg - the index of the start of the message
+ */
+uint16_t getTcs3400Data16MessageData(Bb * buf, BbBlock msg ){
+	uint16_t i = 0;
+	i += TCS_3400_DATA_16_MESSAGE_DATA_INDEX;
+	return getBbUint16(buf, msg, i);
+}
+/**
+ * Tests if the current message containts the data field
+ */
+bool isTcs3400Data16MessageDataPresent(Bb * buf, BbBlock msg ){
+	return TCS_3400_DATA_16_MESSAGE_DATA_ORDINAL <= (getBbMessageMaxOrdinal(buf, msg));
+}
+/**
+ * Adds a Tcs 3400 Data 8 Message to the end of the current buffer
+ * A message to pass 8-bit data from the tcs3400 colour sensor into blueberry studio
+ * @param buf - the message buffer to add the message to
+ * @param param - An enum for defining the available 8-bit parameters of the tcs3400
+ * @param data
+ * @returns - the index of the new message.
+ */
+BbBlock addTcs3400Data8Message(Bb * buf, Parameter8Enum param, uint8_t data){
+	BbBlock msg = buf->length;
+	//Extend buffer to include the main message body before writing it
+	buf->length = msg + TCS_3400_DATA_8_MESSAGE_LENGTH;
+	setBbUint32(buf, msg, TCS_3400_DATA_8_MESSAGE_MODULE_MESSAGE_KEY_INDEX, TCS_3400_DATA_8_MESSAGE_MODULE_MESSAGE_KEY);
+	setBbUint16(buf, msg, TCS_3400_DATA_8_MESSAGE_LENGTH_INDEX, TCS_3400_DATA_8_MESSAGE_LENGTH/4);//length field is measured in 4-byte words
+	setBbUint8(buf, msg, TCS_3400_DATA_8_MESSAGE_MAX_ORDINAL_INDEX, TCS_3400_DATA_8_MESSAGE_MAX_ORDINAL);
+	setBbUint8(buf, msg, TCS_3400_DATA_8_MESSAGE_PARAM_INDEX, param);
+	setBbUint8(buf, msg, TCS_3400_DATA_8_MESSAGE_DATA_INDEX, data);
+	return msg;
+}
+/**
+ * Tests if the current message has no fields present.
+ * A message to pass 8-bit data from the tcs3400 colour sensor into blueberry studio
+ */
+bool isTcs3400Data8MessageEmpty(Bb * buf, BbBlock msg){
+	return getBbMessageMaxOrdinal(buf, msg) <= 2;//will always be length and ordinal fields
+}
+/**
+ * Tests if the current message has all defined fields present.
+ * A message to pass 8-bit data from the tcs3400 colour sensor into blueberry studio
+ */
+bool isTcs3400Data8MessageFull(Bb * buf, BbBlock msg){
+	return getBbMessageMaxOrdinal(buf, msg) >= TCS_3400_DATA_8_MESSAGE_MAX_ORDINAL;
+}
+/**
+ * A getter for the param field
+ * An enum for defining the available 8-bit parameters of the tcs3400
+ * @param buf - the message buffer to add the message to
+ * @param msg - the index of the start of the message
+ */
+Parameter8Enum getTcs3400Data8MessageParam(Bb * buf, BbBlock msg ){
+	uint16_t i = 0;
+	i += TCS_3400_DATA_8_MESSAGE_PARAM_INDEX;
+	return getBbUint8(buf, msg, i);
+}
+/**
+ * Tests if the current message containts the param field
+ * An enum for defining the available 8-bit parameters of the tcs3400
+ */
+bool isTcs3400Data8MessageParamPresent(Bb * buf, BbBlock msg ){
+	return TCS_3400_DATA_8_MESSAGE_PARAM_ORDINAL <= (getBbMessageMaxOrdinal(buf, msg));
+}
+/**
+ * A getter for the data field
+ * @param buf - the message buffer to add the message to
+ * @param msg - the index of the start of the message
+ */
+uint8_t getTcs3400Data8MessageData(Bb * buf, BbBlock msg ){
+	uint16_t i = 0;
+	i += TCS_3400_DATA_8_MESSAGE_DATA_INDEX;
+	return getBbUint8(buf, msg, i);
+}
+/**
+ * Tests if the current message containts the data field
+ */
+bool isTcs3400Data8MessageDataPresent(Bb * buf, BbBlock msg ){
+	return TCS_3400_DATA_8_MESSAGE_DATA_ORDINAL <= (getBbMessageMaxOrdinal(buf, msg));
 }
 /**
  * Adds a Thermistor Config Message to the end of the current buffer
